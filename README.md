@@ -5,7 +5,7 @@ Hey everyone! I got tired of manually typing out, formatting, and aligning cover
 
 It has a massive built-in database of the EEE curriculum (from 1st year all the way to 4th year). You just pick your course and experiment from a dropdown, type in your ID, and it perfectly formats an A4 cover page ready to print or save as a PDF.
 
- **[Use the Generator Here]()**
+ **[Use the Generator Here](https://ibuk-i.github.io/aust-cover-page/)**
 
 ---
 
