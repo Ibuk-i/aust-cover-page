@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AUST Cover Page Generator</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --panel-2: #1e2430;
+      --text: #e6ebf3;
+      --muted: #9aa6bb;
+      --accent: #38b46c;
+      --warning: #b8843b;
+      --border: #2c3443;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(320px, 380px) 1fr;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Calibri, Arial, sans-serif;
+    }
+
+    .sidebar {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+    }
+
+    .muted {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .section {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 14px;
+      padding: 12px;
+      background: var(--panel-2);
+    }
+
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 0.98rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .two {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    label {
+      display: block;
+      font-size: 0.83rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 8px 9px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: #0f1320;
+      color: var(--text);
+      font: inherit;
+    }
+
+    input:disabled, select:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    #overrideExperiment {
+      border-color: var(--warning);
+      background: #2c241a;
+    }
+
+    .print-btn {
+      background: var(--accent);
+      border: 0;
+      color: #08150d;
+      font-weight: 700;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+
+    .print-btn:hover { filter: brightness(1.05); }
+
+    .notice {
+      margin-top: 8px;
+      color: #f1d4a7;
+      font-size: 0.79rem;
+      line-height: 1.32;
+    }
+
+    .preview-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      overflow: auto;
+      background: #1b1f28;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      color: #000;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      padding: 24mm 20mm;
+      font-family: "Times New Roman", Times, serif;
+      line-height: 1.35;
+    }
+
+    .center { text-align: center; }
+
+    .logo {
+      width: 86px;
+      height: 86px;
+      margin: 8px auto 10px;
+      border-radius: 999px;
+      border: 1px solid #3a3a3a;
+      display: block;
+    }
+
+    .dept, .uni {
+      font-weight: 700;
+      font-size: 13.5pt;
+    }
+
+    .title {
+      margin: 18px 0 14px;
+      font-weight: 700;
+      font-size: 15pt;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      border: 1px solid #000;
+      padding: 6px 10px;
+      display: inline-block;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 12pt;
+    }
+
+    .table td {
+      border: 1px solid #000;
+      padding: 7px 9px;
+      vertical-align: top;
+    }
+
+    .meta {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      font-size: 12pt;
+    }
+
+    .meta .label { font-weight: 700; }
+
+    @media (max-width: 1120px) {
+      body { grid-template-columns: 1fr; }
+      .sidebar { max-height: none; }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        display: block;
+      }
+      .sidebar { display: none !important; }
+      .preview-wrap {
+        padding: 0;
+        background: #fff;
+      }
+      .page {
+        margin: 0;
+        width: 100%;
+        min-height: auto;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h1>AUST Lab Report Cover Page Generator</h1>
+    <p class="muted">Dark mode editing + light mode print. All data stays in your browser.</p>
+
+    <section class="section">
+      <h2>1) Department</h2>
+      <div class="grid">
+        <div>
+          <label for="departmentMode">Department Mode</label>
+          <select id="departmentMode">
+            <option value="eee">Electrical &amp; Electronic Engineering (Default)</option>
+            <option value="other">Other Department (Manual Entry)</option>
+          </select>
+        </div>
+        <div>
+          <label for="departmentManual">Custom Department Name</label>
+          <input id="departmentManual" type="text" placeholder="e.g., Civil Engineering" disabled>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>2) Automated Presets</h2>
+      <div class="grid">
+        <div>
+          <label for="coursePreset">Course Preset</label>
+          <select id="coursePreset"></select>
+        </div>
+        <div>
+          <label for="experimentPreset">Experiment No (From Manual)</label>
+          <select id="experimentPreset"></select>
+        </div>
+        <div>
+          <label for="overrideExperiment">Shift / Override Title</label>
+          <select id="overrideExperiment"></select>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>3) Final Print Values (Editable)</h2>
+      <div class="grid two">
+        <div>
+          <label for="courseCode">Course Code</label>
+          <input id="courseCode" type="text">
+        </div>
+        <div>
+          <label for="courseName">Course Name</label>
+          <input id="courseName" type="text">
+        </div>
+        <div>
+          <label for="expNo">Exp No</label>
+          <input id="expNo" type="text" placeholder="01">
+        </div>
+        <div>
+          <label for="expName">Exp Name</label>
+          <input id="expName" type="text">
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4) Student Identity &amp; Term</h2>
+      <div class="grid two">
+        <div>
+          <label for="studentName">Name</label>
+          <input id="studentName" type="text" placeholder="Your Full Name">
+        </div>
+        <div>
+          <label for="studentId">ID</label>
+          <input id="studentId" type="text" placeholder="e.g., 20XXXXXXX">
+        </div>
+        <div>
+          <label for="section">Section</label>
+          <input id="section" type="text" placeholder="A2">
+        </div>
+        <div>
+          <label for="group">Group</label>
+          <input id="group" type="text" placeholder="1">
+        </div>
+        <div>
+          <label for="year">Year</label>
+          <input id="year" type="text" placeholder="2nd Year">
+        </div>
+        <div>
+          <label for="semester">Semester</label>
+          <input id="semester" type="text" placeholder="2nd Semester">
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>5) Dates</h2>
+      <div class="grid two">
+        <div>
+          <label for="datePerformance">Date of Performance</label>
+          <input id="datePerformance" type="date">
+        </div>
+        <div>
+          <label for="dateSubmission">Date of Submission</label>
+          <input id="dateSubmission" type="date">
+        </div>
+      </div>
+      <button class="print-btn" id="printBtn">Save as PDF / Print</button>
+      <p class="notice">CRITICAL PRINT SETTING: In print dialog, enable <strong>More settings → Background graphics</strong> to preserve logo colors.</p>
+    </section>
+  </aside>
+
+  <main class="preview-wrap">
+    <article class="page">
+      <div class="center">
+        <div class="uni">AHSANULLAH UNIVERSITY OF SCIENCE AND TECHNOLOGY</div>
+        <svg class="logo" viewBox="0 0 100 100" aria-label="AUST Logo">
+          <circle cx="50" cy="50" r="49" fill="#ffffff" />
+          <circle cx="50" cy="50" r="38" fill="#00539b" />
+          <circle cx="50" cy="50" r="25" fill="#f1c40f" />
+          <path d="M50 28 L63 70 L56 70 L53 61 L47 61 L44 70 L37 70 Z" fill="#c0392b" />
+          <path d="M50 42 L49 42 L47 55 L53 55 Z" fill="#fff" />
+        </svg>
+        <div class="dept" id="previewDepartment">DEPARTMENT OF ELECTRICAL &amp; ELECTRONIC ENGINEERING</div>
+        <div class="title">LABORATORY REPORT COVER PAGE</div>
+      </div>
+
+      <table class="table">
+        <tr>
+          <td style="width:34%"><strong>Course Code</strong></td>
+          <td id="previewCourseCode"></td>
+        </tr>
+        <tr>
+          <td><strong>Course Name</strong></td>
+          <td id="previewCourseName"></td>
+        </tr>
+        <tr>
+          <td><strong>Experiment No</strong></td>
+          <td id="previewExpNo"></td>
+        </tr>
+        <tr>
+          <td><strong>Experiment Title</strong></td>
+          <td id="previewExpName"></td>
+        </tr>
+      </table>
+
+      <table class="table" style="margin-top:16px">
+        <tr>
+          <td style="width:34%"><strong>Name of Student</strong></td>
+          <td id="previewStudentName"></td>
+        </tr>
+        <tr>
+          <td><strong>ID No</strong></td>
+          <td id="previewStudentId"></td>
+        </tr>
+        <tr>
+          <td><strong>Section</strong></td>
+          <td id="previewSection"></td>
+        </tr>
+        <tr>
+          <td><strong>Group</strong></td>
+          <td id="previewGroup"></td>
+        </tr>
+        <tr>
+          <td><strong>Year &amp; Semester</strong></td>
+          <td><span id="previewYear"></span> <span id="previewSemester"></span></td>
+        </tr>
+      </table>
+
+      <div class="meta">
+        <div><span class="label">Date of Performance:</span> <span id="previewPerformanceDate"></span></div>
+        <div><span class="label">Date of Submission:</span> <span id="previewSubmissionDate"></span></div>
+      </div>
+    </article>
+  </main>
+
+  <script>
+    const defaultDepartment = 'Electrical & Electronic Engineering';
+
+    const courses = [
+      {
+        year: '1st Year',
+        semester: '2nd Semester',
+        code: 'EEE 1204',
+        name: 'Electrical Circuits I Sessional',
+        experiments: [
+          { no: '01', title: 'Verification of Ohm’s Law and KCL/KVL' },
+          { no: '02', title: 'Series and Parallel Circuit Analysis' },
+          { no: '03', title: 'Thevenin and Norton Equivalent Circuits' },
+          { no: '04', title: 'Superposition Theorem' }
+        ]
+      },
+      {
+        year: '2nd Year',
+        semester: '1st Semester',
+        code: 'EEE 2104',
+        name: 'Electrical Circuits II Sessional',
+        experiments: [
+          { no: '01', title: 'Transient Response of RC Circuit' },
+          { no: '02', title: 'Transient Response of RL Circuit' },
+          { no: '03', title: 'Series Resonance in RLC Circuit' },
+          { no: '04', title: 'Parallel Resonance in RLC Circuit' }
+        ]
+      },
+      {
+        year: '2nd Year',
+        semester: '2nd Semester',
+        code: 'EEE 2200',
+        name: 'Electrical Machine I Sessional',
+        experiments: [
+          { no: '01', title: 'Constructional Features of DC Machines' },
+          { no: '02', title: 'Open Circuit and Short Circuit Test' },
+          { no: '03', title: 'Speed Control of DC Shunt Motor' },
+          { no: '04', title: 'Load Characteristics of DC Generator' }
+        ]
+      },
+      {
+        year: '3rd Year',
+        semester: '1st Semester',
+        code: 'EEE 3102',
+        name: 'Electronics II Sessional',
+        experiments: [
+          { no: '01', title: 'Characteristics of BJT in CE Configuration' },
+          { no: '02', title: 'JFET Characteristics and Parameters' },
+          { no: '03', title: 'Operational Amplifier Inverting Amplifier' },
+          { no: '04', title: 'Op-Amp Integrator and Differentiator' }
+        ]
+      }
+    ];
+
+    const el = {
+      departmentMode: document.getElementById('departmentMode'),
+      departmentManual: document.getElementById('departmentManual'),
+      coursePreset: document.getElementById('coursePreset'),
+      experimentPreset: document.getElementById('experimentPreset'),
+      overrideExperiment: document.getElementById('overrideExperiment'),
+      courseCode: document.getElementById('courseCode'),
+      courseName: document.getElementById('courseName'),
+      expNo: document.getElementById('expNo'),
+      expName: document.getElementById('expName'),
+      studentName: document.getElementById('studentName'),
+      studentId: document.getElementById('studentId'),
+      section: document.getElementById('section'),
+      group: document.getElementById('group'),
+      year: document.getElementById('year'),
+      semester: document.getElementById('semester'),
+      datePerformance: document.getElementById('datePerformance'),
+      dateSubmission: document.getElementById('dateSubmission'),
+      printBtn: document.getElementById('printBtn'),
+      previewDepartment: document.getElementById('previewDepartment'),
+      previewCourseCode: document.getElementById('previewCourseCode'),
+      previewCourseName: document.getElementById('previewCourseName'),
+      previewExpNo: document.getElementById('previewExpNo'),
+      previewExpName: document.getElementById('previewExpName'),
+      previewStudentName: document.getElementById('previewStudentName'),
+      previewStudentId: document.getElementById('previewStudentId'),
+      previewSection: document.getElementById('previewSection'),
+      previewGroup: document.getElementById('previewGroup'),
+      previewYear: document.getElementById('previewYear'),
+      previewSemester: document.getElementById('previewSemester'),
+      previewPerformanceDate: document.getElementById('previewPerformanceDate'),
+      previewSubmissionDate: document.getElementById('previewSubmissionDate')
+    };
+
+    function formatDate(value) {
+      if (!value) return '';
+      const date = new Date(value + 'T00:00:00');
+      if (Number.isNaN(date.getTime())) return '';
+      return new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      }).format(date);
+    }
+
+    function toDepartmentText() {
+      if (el.departmentMode.value === 'other') {
+        return (el.departmentManual.value || 'DEPARTMENT NAME').toUpperCase();
+      }
+      return defaultDepartment.toUpperCase();
+    }
+
+    function updatePreview() {
+      el.previewDepartment.textContent = `DEPARTMENT OF ${toDepartmentText()}`;
+      el.previewCourseCode.textContent = el.courseCode.value;
+      el.previewCourseName.textContent = el.courseName.value;
+      el.previewExpNo.textContent = el.expNo.value;
+      el.previewExpName.textContent = el.expName.value;
+      el.previewStudentName.textContent = el.studentName.value;
+      el.previewStudentId.textContent = el.studentId.value;
+      el.previewSection.textContent = el.section.value;
+      el.previewGroup.textContent = el.group.value;
+      el.previewYear.textContent = el.year.value;
+      el.previewSemester.textContent = el.semester.value;
+      el.previewPerformanceDate.textContent = formatDate(el.datePerformance.value);
+      el.previewSubmissionDate.textContent = formatDate(el.dateSubmission.value);
+    }
+
+    function populateCoursePresets() {
+      el.coursePreset.innerHTML = '';
+      const placeholder = new Option('Select a course preset', '', true, false);
+      placeholder.disabled = true;
+      el.coursePreset.add(placeholder);
+
+      const grouped = new Map();
+      courses.forEach((course, idx) => {
+        const groupKey = `${course.year}, ${course.semester}`;
+        if (!grouped.has(groupKey)) grouped.set(groupKey, []);
+        grouped.get(groupKey).push({ idx, course });
+      });
+
+      grouped.forEach((items, label) => {
+        const group = document.createElement('optgroup');
+        group.label = label;
+        items.forEach(({ idx, course }) => {
+          const opt = new Option(`${course.code} — ${course.name}`, String(idx));
+          group.appendChild(opt);
+        });
+        el.coursePreset.appendChild(group);
+      });
+      if (el.coursePreset.options.length > 1) {
+        el.coursePreset.selectedIndex = 1;
+      }
+    }
+
+    function populateExperimentPresets(course) {
+      el.experimentPreset.innerHTML = '';
+      el.overrideExperiment.innerHTML = '';
+
+      const expPlaceholder = new Option('Select experiment no', '', true, false);
+      expPlaceholder.disabled = true;
+      el.experimentPreset.add(expPlaceholder);
+
+      const ovNone = new Option('No override', '', true, true);
+      el.overrideExperiment.add(ovNone);
+
+      if (!course) return;
+
+      course.experiments.forEach((exp, idx) => {
+        el.experimentPreset.add(new Option(`Exp ${exp.no}`, String(idx)));
+        el.overrideExperiment.add(new Option(`Use title of Exp ${exp.no}: ${exp.title}`, String(idx)));
+      });
+      if (el.experimentPreset.options.length > 1) {
+        el.experimentPreset.selectedIndex = 1;
+      }
+      el.overrideExperiment.selectedIndex = 0;
+    }
+
+    function getSelectedCourse() {
+      const idx = Number(el.coursePreset.value);
+      return Number.isInteger(idx) && idx >= 0 ? courses[idx] : null;
+    }
+
+    function applyCoursePreset() {
+      const course = getSelectedCourse();
+      if (!course) return;
+      el.courseCode.value = course.code;
+      el.courseName.value = course.name;
+      el.year.value = course.year;
+      el.semester.value = course.semester;
+      populateExperimentPresets(course);
+      applyExperimentSelection();
+    }
+
+    function applyExperimentSelection() {
+      const course = getSelectedCourse();
+      if (!course) return;
+      const expIdx = Number(el.experimentPreset.value);
+      const overrideIdx = Number(el.overrideExperiment.value);
+      const selectedExperiment = Number.isInteger(expIdx) && expIdx >= 0 ? course.experiments[expIdx] : null;
+      const overrideExperiment = Number.isInteger(overrideIdx) && overrideIdx >= 0 ? course.experiments[overrideIdx] : null;
+
+      if (selectedExperiment) {
+        el.expNo.value = selectedExperiment.no;
+        el.expName.value = (overrideExperiment || selectedExperiment).title;
+      }
+      updatePreview();
+    }
+
+    function toggleDepartmentMode() {
+      const isOther = el.departmentMode.value === 'other';
+      el.departmentManual.disabled = !isOther;
+      [el.coursePreset, el.experimentPreset, el.overrideExperiment].forEach(input => {
+        input.disabled = isOther;
+      });
+      if (isOther) {
+        el.coursePreset.selectedIndex = 0;
+        el.experimentPreset.selectedIndex = 0;
+        el.overrideExperiment.selectedIndex = 0;
+      } else if (el.coursePreset.selectedIndex <= 0 && el.coursePreset.options.length > 1) {
+        el.coursePreset.selectedIndex = 1;
+        applyCoursePreset();
+      }
+      updatePreview();
+    }
+
+    let previousTitle = document.title;
+    function buildPrintBaseName() {
+      const sanitize = (value) => value.replace(/[\\/:*?"<>|]/g, '-');
+      const code = sanitize((el.courseCode.value || 'COURSE').trim().replace(/\s+/g, ' '));
+      const exp = sanitize((el.expNo.value || '--').trim().replace(/\s+/g, ' '));
+      return `${code}- Exp ${exp}- Cover Page [Auto Generated]`;
+    }
+
+    el.printBtn.addEventListener('click', () => {
+      previousTitle = document.title;
+      document.title = buildPrintBaseName();
+      window.print();
+    });
+
+    window.addEventListener('afterprint', () => {
+      document.title = previousTitle;
+    });
+
+    [
+      el.departmentMode, el.departmentManual, el.courseCode, el.courseName,
+      el.expNo, el.expName, el.studentName, el.studentId, el.section,
+      el.group, el.year, el.semester, el.datePerformance, el.dateSubmission
+    ].forEach(input => input.addEventListener('input', updatePreview));
+
+    el.coursePreset.addEventListener('change', () => {
+      applyCoursePreset();
+      applyExperimentSelection();
+    });
+    el.experimentPreset.addEventListener('change', applyExperimentSelection);
+    el.overrideExperiment.addEventListener('change', applyExperimentSelection);
+    el.departmentMode.addEventListener('change', toggleDepartmentMode);
+
+    populateCoursePresets();
+    applyCoursePreset();
+    toggleDepartmentMode();
+    updatePreview();
+  </script>
+</body>
+</html>
